@@ -2,6 +2,8 @@
 
 # appsflyer-unity-plugin
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
 🛠 In order for us to provide optimal support, we would kindly ask you to submit any issues to support@appsflyer.com
 
 > *When submitting an issue please specify your AppsFlyer sign-up (account) email , your app ID , production steps, logs, code snippets and any additional relevant information.*
@@ -21,7 +23,7 @@
 ### <a id="plugin-build-for"> This plugin is built for
 
 - Android AppsFlyer SDK **v5.4.3** 
-- iOS AppsFlyer SDK **v6.0.5**
+- iOS AppsFlyer SDK **v6.0.7**
 
 
 
