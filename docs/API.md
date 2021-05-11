@@ -48,7 +48,7 @@ The list of available methods for this plugin is described below.
     - [validateAndSendInAppPurchase](#validateAndSendInAppPurchase)
     - [setCollectOaid](#setCollectOaid)
 - [iOS Only API](#iOSOnly)
-    - [setShouldCollectDeviceName](#setShouldCollectDeviceName)
+    - [setShouldCollectDeviceName](#deprecated)
     - [setDisableCollectIAd](#setDisableCollectIAd)
     - [setUseReceiptValidationSandbox](#setUseReceiptValidationSandbox)
     - [setUseUninstallSandbox](#setUseUninstallSandbox)
@@ -69,6 +69,10 @@ The list of available methods for this plugin is described below.
 - [IAppsFlyerValidateReceipt](#IAppsFlyerValidateReceipt)
     - [didFinishValidateReceipt](#didFinishValidateReceipt)
     - [didFinishValidateReceiptWithError](#didFinishValidateReceiptWithError)
+- [Events](#events)
+    - [OnRequestResponse](#onRequestResponse)
+    - [OnInAppResponse](#onInAppResponse)
+    - [OnDeepLinkReceived](#onDeepLinkReceived)
 
 ---
 
@@ -1054,6 +1058,7 @@ Register uninstall - you should register for remote notification and provide App
 
 ##### <a id="waitForATTUserAuthorizationWithTimeoutInterval"> **` void waitForATTUserAuthorizationWithTimeoutInterval(int timeoutInterval)`**
 
+See [here](https://support.appsflyer.com/hc/en-us/articles/207032066-iOS-SDK-V6-X-integration-guide-for-developers#integration-33-configuring-app-tracking-transparency-att-support) for more info. 
 
 | parameter     | type       | description  |
 | -----------   |----------  |--------------|
@@ -1066,7 +1071,6 @@ Register uninstall - you should register for remote notification and provide App
     AppsFlyeriOS.waitForATTUserAuthorizationWithTimeoutInterval(60);
 #endif
 ```
-
 ---
 
 ##### <a id="disableSKAdNetwork"> **` bools disableSKAdNetwork(int isDisabled)`**
@@ -1280,3 +1284,82 @@ For iOS : the callback will return a JSON string from apples verifyReceipt API. 
 ```
 
 ---
+
+## <a id="events"> Events
+    
+##### <a id="onRequestResponse"> **`public static event EventHandler OnRequestResponse`**
+ 
+ The callback for Sessions.<br>
+
+| statusCode      | errorDescription | 
+| ----------- | ----------- | 
+| 200      | null       | 
+| 10   | "Event timeout. Check 'minTimeBetweenSessions' param"        | 
+| 11   | "Skipping event because 'isStopTracking' enabled"        | 
+| 40   | Network error: Error description comes from Android        | 
+| 41   | "No dev key"        | 
+| 50   | "Status code failure" + actual response code from the server        | 
+
+*Example:*
+
+```c#
+    AppsFlyer.OnRequestResponse += (sender, args) =>
+    {
+        var af_args = args as AppsFlyerRequestEventArgs;
+        AppsFlyer.AFLog("AppsFlyerOnRequestResponse", "status code" + af_args.statusCode);
+    };
+```
+
+---
+
+##### <a id="onInAppResponse"> **`public static event EventHandler OnInAppResponse`**
+ 
+ The callback for In-App Events.<br>
+
+| statusCode      | errorDescription | 
+| ----------- | ----------- | 
+| 200      | null       | 
+| 10   | "Event timeout. Check 'minTimeBetweenSessions' param"        | 
+| 11   | "Skipping event because 'isStopTracking' enabled"        | 
+| 40   | Network error: Error description comes from Android        | 
+| 41   | "No dev key"        | 
+| 50   | "Status code failure" + actual response code from the server        | 
+
+*Example:*
+
+```c#
+
+    AppsFlyer.OnInAppResponse += (sender, args) =>
+    {
+        var af_args = args as AppsFlyerRequestEventArgs;
+        AppsFlyer.AFLog("OnRequestResponse", "status code" + af_args.statusCode);
+    }; 
+
+```
+
+---
+
+##### <a id="onDeepLinkReceived"> **`public static event EventHandler OnDeepLinkReceived`**
+ 
+ The callback for Unified Deeplink API.<br>
+
+
+*Example:*
+
+```c#
+
+    // First call init with devKey, appId and gameObject
+    AppsFlyer.initSDK(devKey, appID, this);
+
+
+    AppsFlyer.OnDeepLinkReceived += (sender, args) =>
+    {
+        var deepLinkEventArgs = args as DeepLinkEventsArgs;
+
+        // DEEPLINK LOGIC HERE
+    }; 
+
+```
+
+---
+

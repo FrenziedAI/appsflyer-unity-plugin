@@ -20,6 +20,7 @@
 - [User invite attribution](#UserInviteAttribution)
 - [In-app purchase validation](#InAppPurchaseValidation)
 - [Collect IDFA with ATTrackingManager](#collect-idfa)
+- [Request Listeners](#request-listeners)
 
 ## <a id="init-sdk"> Init SDK 
 
@@ -186,41 +187,50 @@ Essentially, the Universal Links method links between an iOS mobile app and an a
 
 AppsFlyer enables you to track app uninstalls. To handle notifications it requires  to modify your `AppDelegate.m`. Use [didRegisterForRemoteNotificationsWithDeviceToken](https://developer.apple.com/reference/uikit/uiapplicationdelegate) to register to the uninstall feature.
 
+UnityEngine.iOS.NotificationServices is now deprecated. Please use the "Mobile Notifications" package instead. It is available in the Unity package manager. 
+
 *Example:*
 
 ```c#
 using AppsFlyerSDK;
+using Unity.Notifications.iOS;
 
 public class AppsFlyerObjectScript : MonoBehaviour, IAppsFlyerConversionData
 {
-    private bool tokenSent;
 
     void Start()
     {
         AppsFlyer.initSDK("devKey", "appID", this);
         AppsFlyer.startSDK();
-
 #if UNITY_IOS
-        UnityEngine.iOS.NotificationServices.RegisterForNotifications(UnityEngine.iOS.NotificationType.Alert | UnityEngine.iOS.NotificationType.Badge | UnityEngine.iOS.NotificationType.Sound);
+  
+        StartCoroutine(RequestAuthorization());
         Screen.orientation = ScreenOrientation.Portrait;
+
 #endif
 
     }
 
-    void Update()
-    {
+
 #if UNITY_IOS
-        if (!tokenSent)
-        { 
-            byte[] token = UnityEngine.iOS.NotificationServices.deviceToken;
-            if (token != null)
+    IEnumerator RequestAuthorization()
+    {
+      
+        using (var req = new AuthorizationRequest(AuthorizationOption.Alert | AuthorizationOption.Badge, true))
+        {
+
+            while (!req.IsFinished)
             {
-                AppsFlyeriOS.registerUninstall(token);
-                tokenSent = true;
+                yield return null;
             }
+             if (req.Granted && req.DeviceToken != "")
+             {
+                  AppsFlyeriOS.registerUninstall(Encoding.UTF8.GetBytes(req.DeviceToken));
+      
+             }
         }
-#endif
     }
+#endif
 }
 ```
 
@@ -357,6 +367,17 @@ public class AppsFlyerObject : MonoBehaviour, IStoreListener, IAppsFlyerValidate
             }
 
             AppsFlyeriOS.validateAndSendInAppPurchase(prodID, price, currency, transactionID, null, this);
+#elif UNITY_ANDROID
+        var purchaseData = (string)recptToJSON["json"];
+        var signature = (string)recptToJSON["signature"];
+        AppsFlyerAndroid.validateAndSendInAppPurchase(
+        "<google_public_key>", 
+        signature, 
+        purchaseData, 
+        price, 
+        currency, 
+        null, 
+        this);
 #endif
         }
 
@@ -414,6 +435,56 @@ public class AppsFlyerObject : MonoBehaviour, IStoreListener, IAppsFlyerValidate
     ```
     
 
+
+##  <a id="request-listeners"> Request Listeners
+    
+1. Attach the 'AppsFlyer.cs' script to the game object with the AppsFlyer init code. (AppsFlyerObject, ect)
+2. Add the following code **before** startSDK()
+
+Sessions response example:
+
+```c#
+    void Start()
+    {
+        AppsFlyer.OnRequestResponse += AppsFlyerOnRequestResponse;
+        
+        AppsFlyer.initSDK(devKey, appID, this);
+        AppsFlyer.startSDK();
+    }
+
+    void AppsFlyerOnRequestResponse(object sender, EventArgs e)
+    {
+        var args = e as AppsFlyerRequestEventArgs;
+        AppsFlyer.AFLog("AppsFlyerOnRequestResponse", " status code " + args.statusCode);
+    }
+```
+
+In-App response example:
+
+```c#
+    void Start()
+    {
+        AppsFlyer.OnInAppResponse += (sender, args) =>
+        {
+            var af_args = args as AppsFlyerRequestEventArgs;
+            AppsFlyer.AFLog("AppsFlyerOnRequestResponse", " status code " + af_args.statusCode);
+        };
+        
+        AppsFlyer.initSDK(devKey, appID, this);
+        AppsFlyer.startSDK();
+    }
+
+
+```
+
+| statusCode      | errorDescription | 
+| ----------- | ----------- | 
+| 200      | null       | 
+| 10   | "Event timeout. Check 'minTimeBetweenSessions' param"        | 
+| 11   | "Skipping event because 'isStopTracking' enabled"        | 
+| 40   | Network error: Error description comes from Android        | 
+| 41   | "No dev key"        | 
+| 50   | "Status code failure" + actual response code from the server        | 
 
 
 

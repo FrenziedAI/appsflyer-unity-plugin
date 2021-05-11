@@ -1,5 +1,61 @@
 # Versions
 
+## v6.2.61
+
+* Fix android dependency
+
+## v6.2.6
+
+* Update iOS SDK version - 6.2.6
+* Update Android SDK version - 6.2.3
+
+## v6.2.5
+
+* Update iOS SDK version - 6.2.5
+* Deprecated setShouldCollectDeviceName
+* AttributionObject to handle DeepLink
+
+## v6.2.41
+
+* Fix Skad issue
+
+## v6.2.4
+
+* RD-59026 - iOS SDK Version - 6.2.4
+
+## v6.2.3
+
+* RD-54266 - iOS SDK Version - 6.2.3
+
+## v6.2.2
+
+* RD-54266 - iOS SDK Version - 6.2.2
+* RD-54266 - Android SDK Version - 6.2.0
+
+## v6.2.0
+
+* RD-55161 - Fixed don't call start before startSDK() (iOS) 
+* RD-55566 - Fix onAppOpenAttribution called from kill for swizziling class (iOS)
+* RD-45032 - Send reponse code in Purchase Validation Error (iOS) 
+* RD-54266 - iOS SDK Version - 6.2.0
+* RD-54266 - Android SDK Version - 6.1.4
+
+## v6.1.4
+
+* RD-55566 - Fix onAppOpenAttribution called from kill
+
+## v6.1.3
+
+* RD-50954 - Added Unified Deep Linking API
+* RD-54264 - Added addPushNotificationDeepLinkPath api for iOS & Android
+* RD-54266 - iOS SDK Version - 6.1.3
+* RD-54266 - Android SDK Version - 6.1.3
+
+## v6.1.0
+
+* iOS SDK Version - 6.1.1
+* Android SDK Version - 6.1.0
+* Added onRequestResponse and onInAppResponse events.
 
 ## v6.0.7
 
